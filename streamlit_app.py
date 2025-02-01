@@ -11,7 +11,7 @@ def calculate_tax(income, regime='new', deductions_80c=0, hra=0):
             (120000, 0.10),
             (1600000, 0.15),
             (2000000, 0.20),
-            (2500000, 0.25),
+            (2400000, 0.25),
             (float('inf'), 0.30)
         ]
         taxable_income = income - 75000  # Standard deduction
