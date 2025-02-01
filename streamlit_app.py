@@ -1,5 +1,24 @@
 import streamlit as st
 
+def calculate_hra(basic_salary, rent_paid, city_type):
+    """
+    Calculate HRA exemption based on basic salary, rent paid, and city type.
+    """
+    if city_type == "metro":
+        hra_exemption_limit = 0.5 * basic_salary  # 50% of basic for metro cities
+    else:
+        hra_exemption_limit = 0.4 * basic_salary  # 40% of basic for non-metro cities
+
+    # HRA exemption is the minimum of:
+    # 1. Actual HRA received
+    # 2. Rent paid - 10% of basic salary
+    # 3. 50% or 40% of basic salary (based on city type)
+    hra_exemption = min(
+        hra_exemption_limit,  # 50% or 40% of basic
+        rent_paid - 0.1 * basic_salary  # Rent paid minus 10% of basic
+    )
+    return max(hra_exemption, 0)  # Ensure HRA exemption is not negative
+
 def calculate_tax(income, regime='new', deductions_80c=0, hra=0):
     """
     Calculate tax liability under the old or new tax regime.
@@ -50,12 +69,18 @@ st.write("Compare the Old and New Tax Regimes to see which is better for you.")
 
 # Inputs
 income = st.number_input("Enter your annual income (₹):", min_value=0.0, step=1000.0)
+basic_salary = st.number_input("Enter your basic salary (₹):", min_value=0.0, step=1000.0)
+rent_paid = st.number_input("Enter the annual rent paid (₹):", min_value=0.0, step=1000.0)
+city_type = st.selectbox("Select your city type:", ["metro", "non-metro"])
 deductions_80c = st.number_input("Enter your deductions under Section 80C (₹):", min_value=0.0, step=1000.0)
-hra = st.number_input("Enter your House Rent Allowance (HRA) (₹):", min_value=0.0, step=1000.0)
+
+# Calculate HRA
+hra_exemption = calculate_hra(basic_salary, rent_paid, city_type)
+st.write(f"Calculated HRA Exemption: ₹{hra_exemption:,.2f}")
 
 # Calculate taxes
 new_tax = calculate_tax(income, regime='new')
-old_tax = calculate_tax(income, regime='old', deductions_80c=deductions_80c, hra=hra)
+old_tax = calculate_tax(income, regime='old', deductions_80c=deductions_80c, hra=hra_exemption)
 
 # Results
 st.write("\n--- Tax Analysis ---")
