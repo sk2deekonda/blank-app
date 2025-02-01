@@ -19,11 +19,12 @@ def calculate_hra(basic_salary, rent_paid, city_type):
     )
     return max(hra_exemption, 0)  # Ensure HRA exemption is not negative
 
-def calculate_tax(income, regime='new', deductions_80c=0, hra=0):
+def calculate_tax(income, regime='new', deductions_80c=0, hra=0, mediclaim_self=0, mediclaim_parents=0):
     """
     Calculate tax liability under the old or new tax regime.
     """
     if regime == 'new':
+        # Updated new tax regime slabs (FY 2024-25)
         slabs = [
             (400000, 0),
             (800000, 0.05),
@@ -33,7 +34,9 @@ def calculate_tax(income, regime='new', deductions_80c=0, hra=0):
             (2400000, 0.25),
             (float('inf'), 0.30)
         ]
-        taxable_income = income - 75000  # Standard deduction
+        if income <= 1200000:
+            return 0  # No tax for income up to ₹12,00,000 prior to standard deduction
+        taxable_income = income - 75000  # Updated standard deduction of ₹75,000
     elif regime == 'old':
         slabs = [
             (250000, 0),
@@ -41,7 +44,8 @@ def calculate_tax(income, regime='new', deductions_80c=0, hra=0):
             (1000000, 0.20),
             (float('inf'), 0.30)
         ]
-        taxable_income = income - deductions_80c - hra
+        # Deduct Section 80C, HRA, and mediclaim benefits
+        taxable_income = income - deductions_80c - hra - mediclaim_self - mediclaim_parents
     else:
         raise ValueError("Invalid regime. Choose 'new' or 'old'.")
 
@@ -73,6 +77,8 @@ basic_salary = st.number_input("Enter your basic salary (₹):", min_value=0.0, 
 rent_paid = st.number_input("Enter the annual rent paid (₹):", min_value=0.0, step=1000.0)
 city_type = st.selectbox("Select your city type:", ["metro", "non-metro"])
 deductions_80c = st.number_input("Enter your deductions under Section 80C (₹):", min_value=0.0, step=1000.0)
+mediclaim_self = st.number_input("Enter mediclaim premium for self (₹):", min_value=0.0, step=1000.0)
+mediclaim_parents = st.number_input("Enter mediclaim premium for parents (₹):", min_value=0.0, step=1000.0)
 
 # Calculate HRA
 hra_exemption = calculate_hra(basic_salary, rent_paid, city_type)
@@ -80,7 +86,7 @@ st.write(f"Calculated HRA Exemption: ₹{hra_exemption:,.2f}")
 
 # Calculate taxes
 new_tax = calculate_tax(income, regime='new')
-old_tax = calculate_tax(income, regime='old', deductions_80c=deductions_80c, hra=hra_exemption)
+old_tax = calculate_tax(income, regime='old', deductions_80c=deductions_80c, hra=hra_exemption, mediclaim_self=mediclaim_self, mediclaim_parents=mediclaim_parents)
 
 # Results
 st.write("\n--- Tax Analysis ---")
