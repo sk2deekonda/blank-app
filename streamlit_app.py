@@ -34,7 +34,7 @@ def calculate_tax(income, regime='new', deductions_80c=0, hra=0, mediclaim_self=
             (2400000, 0.25),
             (float('inf'), 0.30)
         ]
-        if income <= 1200000:
+        if income <= 1275000:
             return 0  # No tax for income up to ₹12,00,000 prior to standard deduction
         taxable_income = income - 75000  # Updated standard deduction of ₹75,000
     elif regime == 'old':
