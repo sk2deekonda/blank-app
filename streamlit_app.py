@@ -87,7 +87,16 @@ st.write("\n--- Tax Analysis ---")
 st.write(f"Tax under New Regime: ₹{new_tax:,.2f}")
 st.write(f"Tax under Old Regime: ₹{old_tax:,.2f}")
 
+# Calculate total benefit
 if new_tax < old_tax:
+    total_benefit_yearly = old_tax - new_tax
+    total_benefit_monthly = total_benefit_yearly / 12
     st.write("\nConclusion: The **New Tax Regime** is better for you.")
+    st.write(f"**Total Benefit (Yearly):** ₹{total_benefit_yearly:,.2f}")
+    st.write(f"**Total Benefit (Monthly):** ₹{total_benefit_monthly:,.2f}")
 else:
+    total_benefit_yearly = new_tax - old_tax
+    total_benefit_monthly = total_benefit_yearly / 12
     st.write("\nConclusion: The **Old Tax Regime** is better for you.")
+    st.write(f"**Total Benefit (Yearly):** ₹{total_benefit_yearly:,.2f}")
+    st.write(f"**Total Benefit (Monthly):** ₹{total_benefit_monthly:,.2f}")
