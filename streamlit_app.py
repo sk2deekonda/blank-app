@@ -68,7 +68,7 @@ def calculate_tax(income, regime='new', deductions_80c=0, hra=0, mediclaim_self=
     return tax
 
 # Streamlit App
-st.title("Income Tax Regime Calculator (India)")
+st.title("Income Tax Regime Calculator (India) by Sid D")
 st.write("Compare the Old and New Tax Regimes to see which is better for you.")
 
 # Inputs
