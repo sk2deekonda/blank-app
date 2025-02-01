@@ -19,7 +19,7 @@ def calculate_hra(basic_salary, rent_paid, city_type):
     )
     return max(hra_exemption, 0)  # Ensure HRA exemption is not negative
 
-def calculate_tax(income, regime='new', deductions_80c=0, hra=0, mediclaim_self=0, mediclaim_parents=0):
+def calculate_tax(income, regime='new', deductions_80c=0, hra=0, mediclaim_self=0, mediclaim_parents=0, housing_loan_interest=0):
     """
     Calculate tax liability under the old or new tax regime.
     """
@@ -44,8 +44,9 @@ def calculate_tax(income, regime='new', deductions_80c=0, hra=0, mediclaim_self=
             (1000000, 0.20),
             (float('inf'), 0.30)
         ]
-        # Deduct Section 80C, HRA, and mediclaim benefits
-        taxable_income = income - deductions_80c - hra - mediclaim_self - mediclaim_parents
+        # Deduct Section 80C, HRA, mediclaim, and housing loan interest (up to ₹2,00,000)
+        housing_loan_interest_deduction = min(housing_loan_interest, 200000)
+        taxable_income = income - deductions_80c - hra - mediclaim_self - mediclaim_parents - housing_loan_interest_deduction
     else:
         raise ValueError("Invalid regime. Choose 'new' or 'old'.")
 
@@ -79,6 +80,7 @@ city_type = st.selectbox("Select your city type:", ["metro", "non-metro"])
 deductions_80c = st.number_input("Enter your deductions under Section 80C (₹):", min_value=0.0, step=1000.0)
 mediclaim_self = st.number_input("Enter mediclaim premium for self (₹):", min_value=0.0, step=1000.0)
 mediclaim_parents = st.number_input("Enter mediclaim premium for parents (₹):", min_value=0.0, step=1000.0)
+housing_loan_interest = st.number_input("Enter housing loan interest paid (₹):", min_value=0.0, step=1000.0)
 
 # Calculate HRA
 hra_exemption = calculate_hra(basic_salary, rent_paid, city_type)
@@ -86,7 +88,15 @@ st.write(f"Calculated HRA Exemption: ₹{hra_exemption:,.2f}")
 
 # Calculate taxes
 new_tax = calculate_tax(income, regime='new')
-old_tax = calculate_tax(income, regime='old', deductions_80c=deductions_80c, hra=hra_exemption, mediclaim_self=mediclaim_self, mediclaim_parents=mediclaim_parents)
+old_tax = calculate_tax(
+    income,
+    regime='old',
+    deductions_80c=deductions_80c,
+    hra=hra_exemption,
+    mediclaim_self=mediclaim_self,
+    mediclaim_parents=mediclaim_parents,
+    housing_loan_interest=housing_loan_interest
+)
 
 # Results
 st.write("\n--- Tax Analysis ---")
