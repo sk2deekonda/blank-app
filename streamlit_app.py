@@ -34,7 +34,7 @@ def calculate_tax(income, regime='new', deductions_80c=0, hra=0, mediclaim_self=
             (2400000, 0.25),
             (float('inf'), 0.30)
         ]
-        if income <= 1275000:
+        if income <= 1200000:
             return 0  # No tax for income up to ₹12,00,000 prior to standard deduction
         taxable_income = income - 75000  # Updated standard deduction of ₹75,000
     elif regime == 'old':
@@ -68,7 +68,7 @@ def calculate_tax(income, regime='new', deductions_80c=0, hra=0, mediclaim_self=
     return tax
 
 # Streamlit App
-st.title("Income Tax Regime Calculator (India) by Sid D")
+st.title("Income Tax Regime Calculator (India)")
 st.write("Compare the Old and New Tax Regimes to see which is better for you.")
 
 # Inputs
@@ -96,13 +96,25 @@ st.write(f"Tax under Old Regime: ₹{old_tax:,.2f}")
 # Calculate total benefit
 if new_tax < old_tax:
     total_benefit_yearly = old_tax - new_tax
-    total_benefit_monthly = total_benefit_yearly / 12
-    st.write("\nConclusion: The **New Tax Regime** is better for you.")
-    st.write(f"**Total Benefit (Yearly):** ₹{total_benefit_yearly:,.2f}")
-    st.write(f"**Total Benefit (Monthly):** ₹{total_benefit_monthly:,.2f}")
+    st.markdown(
+        f"""
+        <div style='text-align: center; font-size: 24px; font-weight: bold; color: green;'>
+            🎉 The **New Tax Regime** is better for you!<br>
+            Total Benefit (Yearly): ₹{total_benefit_yearly:,.2f}<br>
+            Total Benefit (Monthly): ₹{total_benefit_yearly / 12:,.2f}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 else:
     total_benefit_yearly = new_tax - old_tax
-    total_benefit_monthly = total_benefit_yearly / 12
-    st.write("\nConclusion: The **Old Tax Regime** is better for you.")
-    st.write(f"**Total Benefit (Yearly):** ₹{total_benefit_yearly:,.2f}")
-    st.write(f"**Total Benefit (Monthly):** ₹{total_benefit_monthly:,.2f}")
+    st.markdown(
+        f"""
+        <div style='text-align: center; font-size: 24px; font-weight: bold; color: red;'>
+            🚨 The **Old Tax Regime** is better for you!<br>
+            Total Loss (Yearly): ₹{total_benefit_yearly:,.2f}<br>
+            Total Loss (Monthly): ₹{total_benefit_yearly / 12:,.2f}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
